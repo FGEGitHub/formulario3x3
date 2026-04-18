@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
+import servicio1 from "../services/servicio"
 const jugadorVacio = {
   nombre: "",
   apellido: "",
@@ -81,13 +81,53 @@ export default function Formulario() {
   };
 
   const jugadoresConfirmados = jugadores.filter(j => j.confirmado).length;
+const handleSubmit = async () => {
+  if (jugadoresConfirmados < 3 || !equipo) return;
 
-  const handleSubmit = () => {
-    if (jugadoresConfirmados < 3 || !equipo) return;
+  try {
+    const jugadoresValidos = jugadores
+      .filter(j => j.confirmado)
+      .map(j => ({
+        nombre: j.nombre,
+        apellido: j.apellido,
+        dni: j.dni,
+        fechaNacimiento: j.fechaNacimiento,
+      }));
 
-    console.log("Equipo:", equipo);
-    console.log("Jugadores:", jugadores);
-  };
+    const payload = {
+      equipo,
+      jugadores: jugadoresValidos,
+    };
+
+    await servicio1.enviarequipo(payload);
+
+    alert("Equipo registrado correctamente 🏀");
+
+    // reset opcional
+    setEquipo("");
+    setJugadores([{ ...jugadorVacio }]);
+
+  } catch (error) {
+  console.error(error);
+
+  // ✅ error con detalle (DNIs duplicados)
+  if (error?.detalle) {
+    error.detalle.forEach(d => {
+      alert(d.mensaje);
+    });
+    return;
+  }
+
+  // ✅ error simple del backend
+  if (error?.error) {
+    alert(error.error);
+    return;
+  }
+
+  // ❌ fallback
+  alert("Error al enviar el equipo");
+}
+};
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -281,19 +321,13 @@ export default function Formulario() {
           ))}
 
           {/* FINAL */}
-          <Button
-            variant="contained"
-            disabled={jugadoresConfirmados < 3 || !equipo}
-            onClick={handleSubmit}
-            sx={{
-              bgcolor: "#22c55e",
-              "&:hover": { bgcolor: "#16a34a" },
-              fontWeight: "bold",
-              py: 1.5,
-            }}
-          >
-            Finalizar equipo ({jugadoresConfirmados}/5)
-          </Button>
+      <Button
+  variant="contained"
+  disabled={jugadoresConfirmados < 3 || !equipo}
+  onClick={handleSubmit}
+>
+  Finalizar equipo ({jugadoresConfirmados}/5)
+</Button>
         </Box>
       </Box>
     </LocalizationProvider>
