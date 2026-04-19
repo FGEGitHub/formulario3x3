@@ -28,11 +28,11 @@ const enviarequipo = async (config) => {
 };
 
 
-const solicitarturno = async (datos) => {
+const traerEquipos = async (datos) => {
 
   // const data = await axios.post('http://localhost:4000/signupp', datos)
-  const { data } = await axios.post(baseUrl + 'solicitarturno', datos)
+  const { data } = await axios.get(baseUrl + 'equipos-con-jugadores', datos)
   return data
 
 }
-export default {solicitarturno, enviarequipo}
+export default {traerEquipos, enviarequipo}
