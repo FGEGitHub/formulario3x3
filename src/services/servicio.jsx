@@ -35,4 +35,14 @@ const traerEquipos = async (datos) => {
   return data
 
 }
+
+const traerTorneos = async (datos) => {
+
+  // const data = await axios.post('http://localhost:4000/signupp', datos)
+  const { data } = await axios.get(baseUrl + 'traertorneos', datos)
+  return data
+
+
+
+}
 export default {traerEquipos, enviarequipo}
