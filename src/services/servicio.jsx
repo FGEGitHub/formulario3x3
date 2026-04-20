@@ -45,4 +45,12 @@ const traerTorneos = async (datos) => {
 
 
 }
-export default {traerEquipos, enviarequipo}
+
+const crearTorneo = (data) => {
+  return axios.post(baseUrl + "torneos", data);
+};
+
+
+
+
+export default {crearTorneo,traerEquipos, enviarequipo}

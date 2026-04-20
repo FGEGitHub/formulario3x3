@@ -73,7 +73,26 @@ export default function CrearTorneo() {
 
     return zonas;
   };
+const guardarTorneo = async () => {
+  try {
+    const payload = {
+      nombre,
+      zonas: zonas.map((z, i) => ({
+        nombre: `Zona ${i + 1}`,
+        equipos: z.map(eq => ({
+          id: eq.id
+        }))
+      }))
+    };
 
+    await servicio.crearTorneo(payload);
+
+    alert("Torneo guardado completo 🔥");
+  } catch (error) {
+    console.error(error);
+    alert("Error al guardar torneo");
+  }
+};
   // 🎬 SORTEO CON ANIMACIÓN REAL
   const hacerSorteo = async () => {
     setModo("random");
@@ -377,6 +396,14 @@ export default function CrearTorneo() {
           </DragDropContext>
 
           <Button onClick={() => setStep(4)}>Volver</Button>
+          <Button
+  variant="contained"
+  color="success"
+  sx={{ mt: 3 }}
+  onClick={guardarTorneo}
+>
+  💾 Guardar Torneo
+</Button>
         </>
       )}
     </Box>
