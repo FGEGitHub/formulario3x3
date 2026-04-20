@@ -31,6 +31,10 @@ export default function CrearTorneo() {
   const [modo, setModo] = useState(null);
   const [animando, setAnimando] = useState(false);
 
+  // 🎱 NUEVO (bolillero)
+  const [equipoActual, setEquipoActual] = useState(null);
+  const [mostrarBola, setMostrarBola] = useState(false);
+
   useEffect(() => {
     traerEquipos();
   }, []);
@@ -44,7 +48,6 @@ export default function CrearTorneo() {
 
   const equiposFinal = usarTodos ? equipos : seleccionados;
 
-  // 🔀 shuffle real
   const shuffle = (array) => {
     let arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -54,7 +57,6 @@ export default function CrearTorneo() {
     return arr;
   };
 
-  // 🧠 zonas flexibles
   const generarZonasFlex = (equipos, zonasCant) => {
     const total = equipos.length;
     const base = Math.floor(total / zonasCant);
@@ -72,27 +74,37 @@ export default function CrearTorneo() {
     return zonas;
   };
 
-  // 🎲 animación sorteo
-  const hacerSorteo = () => {
+  // 🎬 SORTEO CON ANIMACIÓN REAL
+  const hacerSorteo = async () => {
     setModo("random");
     setAnimando(true);
 
-    let vueltas = 12;
-    let temp = [...equiposFinal];
+    const mezcla = shuffle(equiposFinal);
+    let nuevasZonas = Array.from({ length: cantidadZonas }, () => []);
 
-    const interval = setInterval(() => {
-      temp = shuffle(temp);
-      setZonas(generarZonasFlex(temp, cantidadZonas));
-      vueltas--;
+    for (let i = 0; i < mezcla.length; i++) {
+      const equipo = mezcla[i];
 
-      if (vueltas === 0) {
-        clearInterval(interval);
-        setAnimando(false);
-      }
-    }, 120);
+      // mostrar bola
+      setEquipoActual(equipo);
+      setMostrarBola(true);
+
+      await new Promise(res => setTimeout(res, 900));
+
+      // asignar equipo
+      const zonaIndex = i % cantidadZonas;
+      nuevasZonas[zonaIndex].push(equipo);
+      setZonas([...nuevasZonas]);
+
+      // ocultar bola
+      setMostrarBola(false);
+
+      await new Promise(res => setTimeout(res, 250));
+    }
+
+    setAnimando(false);
   };
 
-  // 🧲 drag & drop
   const onDragEnd = (result) => {
     if (!result.destination) return;
 
@@ -121,23 +133,73 @@ export default function CrearTorneo() {
   };
 
   return (
-    <Box p={3}>
-      <Typography variant="h4">Crear Torneo</Typography>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        color: "white",
+        p: { xs: 2, md: 4 }
+      }}
+    >
+      {/* 🎨 CSS DEL BOMBO */}
+      <style>
+        {`
+        .bombo {
+          width: 160px;
+          height: 160px;
+          border-radius: 50%;
+          background: radial-gradient(circle, #444, #111);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: auto;
+          margin-bottom: 20px;
+        }
+
+        .bola {
+          width: 90px;
+          height: 90px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #ffcc00, #ff9900);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          font-weight: bold;
+          color: black;
+          padding: 8px;
+          animation: rebote 0.8s ease;
+        }
+
+        @keyframes rebote {
+          0% { transform: translateY(60px) scale(0.4); opacity: 0; }
+          40% { transform: translateY(-20px) scale(1.1); }
+          70% { transform: translateY(10px); }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+      `}
+      </style>
+
+      <Typography variant="h4" mb={2}>
+        Crear Torneo
+      </Typography>
 
       {/* STEP 1 */}
       {step === 1 && (
         <>
           <TextField
-            label="Nombre"
+            label="Nombre del torneo"
             fullWidth
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            sx={{ mt: 2 }}
+            sx={{
+              mb: 2,
+              input: { color: "white" },
+              label: { color: "#ccc" }
+            }}
           />
 
-          <Typography mt={2}>
-            Equipos disponibles: {equipos.length}
-          </Typography>
+          <Typography>Equipos disponibles: {equipos.length}</Typography>
 
           <FormControlLabel
             control={
@@ -152,7 +214,7 @@ export default function CrearTorneo() {
             label="Participan todos"
           />
 
-          <Button onClick={() => setStep(2)} variant="contained">
+          <Button variant="contained" onClick={() => setStep(2)}>
             Siguiente
           </Button>
         </>
@@ -182,9 +244,9 @@ export default function CrearTorneo() {
 
           <Button onClick={() => setStep(1)}>Volver</Button>
           <Button
-            onClick={() => setStep(3)}
-            disabled={seleccionados.length < 4}
             variant="contained"
+            disabled={seleccionados.length < 4}
+            onClick={() => setStep(3)}
           >
             Siguiente
           </Button>
@@ -194,9 +256,7 @@ export default function CrearTorneo() {
       {/* STEP 3 */}
       {(step === 2 && usarTodos) || step === 3 ? (
         <>
-          <Typography mt={3}>
-            Cantidad de zonas
-          </Typography>
+          <Typography mt={3}>Cantidad de zonas</Typography>
 
           <Box mt={2} display="flex" gap={1} flexWrap="wrap">
             {[2,3,4,5,6,7,8].map((n) => (
@@ -205,17 +265,17 @@ export default function CrearTorneo() {
                 variant={cantidadZonas === n ? "contained" : "outlined"}
                 onClick={() => setCantidadZonas(n)}
               >
-                {n} zonas
+                {n}
               </Button>
             ))}
           </Box>
 
           <Typography mt={2}>
-            Se distribuirán {equiposFinal.length} equipos
+            {equiposFinal.length} equipos serán distribuidos
           </Typography>
 
           <Button onClick={() => setStep(2)}>Volver</Button>
-          <Button onClick={() => setStep(4)} variant="contained">
+          <Button variant="contained" onClick={() => setStep(4)}>
             Confirmar
           </Button>
         </>
@@ -253,17 +313,27 @@ export default function CrearTorneo() {
         </>
       )}
 
-      {/* STEP 5 RESULTADO */}
+      {/* STEP 5 */}
       {step === 5 && (
         <>
+          {modo === "random" && animando && (
+            <Box className="bombo">
+              {mostrarBola && (
+                <Box className="bola">
+                  {equipoActual?.nombre}
+                </Box>
+              )}
+            </Box>
+          )}
+
           <Typography mt={3}>
-            Zonas ({modo}) {animando && "🎬 sorteando..."}
+            Zonas ({modo}) {animando && "🎱 Sorteando..."}
           </Typography>
 
           <DragDropContext onDragEnd={onDragEnd}>
             <Grid container spacing={2} mt={2}>
               {zonas.map((zona, i) => (
-                <Grid item xs={12} md={3} key={i}>
+                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
                   <Droppable droppableId={i.toString()}>
                     {(provided) => (
                       <Card ref={provided.innerRef} {...provided.droppableProps}>
@@ -286,9 +356,8 @@ export default function CrearTorneo() {
                                   sx={{
                                     p: 1,
                                     m: 1,
-                                    background: "#eee",
-                                    borderRadius: 1,
-                                    cursor: "grab"
+                                    borderRadius: 2,
+                                    background: "#00c6ff"
                                   }}
                                 >
                                   {eq.nombre}
