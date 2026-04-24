@@ -33,55 +33,88 @@ export default function TorneosAdmin() {
   }, []);
 
   return (
-    <Box p={3}>
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <Typography variant="h4">Torneos</Typography>
+ <Box
+  sx={{
+    minHeight: "100vh",
+    backgroundImage: "url('/fondo.jpg')", // 👈 tu imagen
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    p: 3,
+  }}
+>
+<Box
+  display="flex"
+  justifyContent="space-between"
+  alignItems="center"
+  mb={3}
+>
+  <Typography variant="h4" color="#fff">
+    🏆 Torneos
+  </Typography>
 
-        <Button
-          variant="contained"
-          onClick={() => navigate("/admincreartorneo")}
-        >
-          Crear Torneo
-        </Button>
-      </Box>
+  <Button
+    variant="contained"
+    color="warning"
+    onClick={() => navigate("/admincreartorneo")}
+  >
+    + Crear Torneo
+  </Button>
+</Box>
 
       {/* Tabla */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nombre</TableCell>
-                  <TableCell>Acciones</TableCell> {/* 👈 nueva */}
-
-            </TableRow>
-          </TableHead>
-
-         <TableBody>
+     <Box display="flex" flexWrap="wrap" gap={3}>
   {torneos.length > 0 ? (
     torneos.map((torneo) => (
-      <TableRow key={torneo.id}>
-        <TableCell>{torneo.nombre || "Sin nombre"}</TableCell>
+      <Paper
+        key={torneo.id}
+        sx={{
+          width: 280,
+          p: 2,
+          borderRadius: 4,
+          background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+          color: "#fff",
+          boxShadow: 4,
+          transition: "0.3s",
+          "&:hover": {
+            transform: "scale(1.05)",
+            boxShadow: 8,
+          },
+        }}
+      >
+        <Typography variant="h6" mb={1}>
+          {torneo.nombre || "Sin nombre"}
+        </Typography>
 
-        <TableCell>
+        <Typography variant="body2" mb={2} sx={{ opacity: 0.8 }}>
+          Torneo activo
+        </Typography>
+
+        <Box display="flex" gap={1}>
           <Button
+            fullWidth
             variant="contained"
-            size="small"
+            color="success"
             onClick={() => navigate(`/admintorneo/${torneo.id}`)}
           >
-            Ir a torneo
+            Ver
           </Button>
-        </TableCell>
-      </TableRow>
+
+          <Button
+            fullWidth
+            variant="outlined"
+            sx={{ color: "#fff", borderColor: "#fff" }}
+            onClick={() => navigate(`/tablastorneo/${torneo.id}`)}
+          >
+            Tablas
+          </Button>
+        </Box>
+      </Paper>
     ))
   ) : (
-    <TableRow>
-      <TableCell colSpan={2}>No hay torneos</TableCell>
-    </TableRow>
+    <Typography color="#fff">No hay torneos</Typography>
   )}
-</TableBody>
-        </Table>
-      </TableContainer>
+</Box>
     </Box>
   );
 }
