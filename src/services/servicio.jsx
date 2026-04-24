@@ -50,7 +50,18 @@ const crearTorneo = (data) => {
   return axios.post(baseUrl + "torneos", data);
 };
 
+const traerTorneo = async (id) => {
+  const { data } = await axios.get(`${baseUrl}traertorneo/${id}`);
+  return data;
+};
+
+const guardarPartido = async (datos) => {
+
+ const { data } = await axios.post(`${baseUrl}guardarpartido/`, datos);
+
+ return data;
+};
 
 
 
-export default {crearTorneo,traerEquipos, enviarequipo}
+export default {crearTorneo,traerEquipos, enviarequipo,traerTorneos, traerTorneo, guardarPartido}

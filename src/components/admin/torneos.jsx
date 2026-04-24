@@ -8,7 +8,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  TableContainer
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import servicio from "../../services/servicio";
@@ -20,7 +21,8 @@ export default function TorneosAdmin() {
   const traerTorneos = async () => {
     try {
       const response = await servicio.traerTorneos();
-      setTorneos(response?.data || []);
+      console.log("Torneos traídos:", response);
+      setTorneos(response);
     } catch (error) {
       console.error("Error al traer torneos:", error);
     }
@@ -45,27 +47,41 @@ export default function TorneosAdmin() {
       </Box>
 
       {/* Tabla */}
-      <Table component={Paper}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Nombre</TableCell>
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {torneos.length > 0 ? (
-            torneos.map((torneo) => (
-              <TableRow key={torneo.id}>
-                <TableCell>{torneo.nombre}</TableCell>
-              </TableRow>
-            ))
-          ) : (
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
             <TableRow>
-              <TableCell>No hay torneos</TableCell>
+              <TableCell>Nombre</TableCell>
+                  <TableCell>Acciones</TableCell> {/* 👈 nueva */}
+
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHead>
+
+         <TableBody>
+  {torneos.length > 0 ? (
+    torneos.map((torneo) => (
+      <TableRow key={torneo.id}>
+        <TableCell>{torneo.nombre || "Sin nombre"}</TableCell>
+
+        <TableCell>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate(`/torneo/${torneo.id}`)}
+          >
+            Ir a torneo
+          </Button>
+        </TableCell>
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={2}>No hay torneos</TableCell>
+    </TableRow>
+  )}
+</TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }
