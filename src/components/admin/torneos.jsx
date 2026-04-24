@@ -67,7 +67,7 @@ export default function TorneosAdmin() {
           <Button
             variant="contained"
             size="small"
-            onClick={() => navigate(`/torneo/${torneo.id}`)}
+            onClick={() => navigate(`/admintorneo/${torneo.id}`)}
           >
             Ir a torneo
           </Button>

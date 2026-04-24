@@ -5,6 +5,7 @@ import Jugadores from '../pages/adminjugadores';
 import Torneos from '../pages/admintorneos';
 import Creartorneo from '../pages/admincreartorneo';
 import Admintorneo from '../pages/admintorneo';
+import Admintorneotablas from '../pages/admintablatorneo';
 
 
 const Rutas = [
@@ -14,7 +15,8 @@ const Rutas = [
 { path: '/adminjugadores', element: <Jugadores /> },
 { path: '/admintorneos', element: <Torneos /> },
 { path: '/admincreartorneo', element: <Creartorneo /> },
-{ path: '/torneo/:id', element: <Admintorneo /> }
+{ path: '/admintorneo/:id', element: <Admintorneo /> },
+{ path: '/tablastorneo/:id', element: <Admintorneotablas /> }
 
     ];
 

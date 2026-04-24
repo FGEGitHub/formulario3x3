@@ -55,6 +55,12 @@ const traerTorneo = async (id) => {
   return data;
 };
 
+const traertablas = async (id) => {
+  const { data } = await axios.get(`${baseUrl}traertablas/${id}`);
+  return data;
+};
+
+
 const guardarPartido = async (datos) => {
 
  const { data } = await axios.post(`${baseUrl}guardarpartido/`, datos);
@@ -64,4 +70,4 @@ const guardarPartido = async (datos) => {
 
 
 
-export default {crearTorneo,traerEquipos, enviarequipo,traerTorneos, traerTorneo, guardarPartido}
+export default {crearTorneo,traerEquipos, enviarequipo,traerTorneos, traerTorneo, guardarPartido, traertablas}
