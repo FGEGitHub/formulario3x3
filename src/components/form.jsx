@@ -17,6 +17,8 @@ const jugadorVacio = {
   nombre: "",
   apellido: "",
   dni: "",
+  telefono: "",
+  email: "",
   fechaNacimiento: null,
   confirmado: false,
   editando: false,
@@ -25,20 +27,25 @@ const jugadorVacio = {
 export default function Formulario() {
   const [equipo, setEquipo] = useState("");
   const [jugadores, setJugadores] = useState([{ ...jugadorVacio }]);
-
+const [seleccionCapitan, setSeleccionCapitan] = useState(false);
+const [capitan, setCapitan] = useState(null);
   // 🎨 estilos inputs oscuros
-  const inputStyles = {
-    "& .MuiOutlinedInput-root": {
-      color: "#fff",
-      backgroundColor: "#020617",
-      borderRadius: 2,
-      "& fieldset": { borderColor: "#475569" },
-      "&:hover fieldset": { borderColor: "#f97316" },
-      "&.Mui-focused fieldset": { borderColor: "#22c55e" },
-    },
-    "& .MuiInputLabel-root": { color: "#cbd5f5" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#22c55e" },
-  };
+ const inputStyles = {
+  "& .MuiOutlinedInput-root": {
+    color: "#fff",
+    backgroundColor: "#020617",
+    borderRadius: 2,
+    "& fieldset": { borderColor: "#475569" },
+    "&:hover fieldset": { borderColor: "#f97316" },
+    "&.Mui-focused fieldset": { borderColor: "#22c55e" },
+  },
+  "& .MuiInputLabel-root": {
+    color: "#fff",
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#22c55e",
+  },
+};
 
   const handleChangeJugador = (index, field, value) => {
     const nuevos = [...jugadores];
@@ -50,7 +57,8 @@ export default function Formulario() {
     const nuevos = [...jugadores];
     const j = nuevos[index];
 
-    if (!j.nombre || !j.apellido || !j.dni) return;
+    if (!j.nombre || !j.apellido || !j.dni ||  !j.telefono ||
+  !j.email) return;
 
     nuevos[index].confirmado = true;
     nuevos[index].editando = false;
@@ -92,20 +100,24 @@ const handleSubmit = async () => {
         apellido: j.apellido,
         dni: j.dni,
         fechaNacimiento: j.fechaNacimiento,
+        telefono: j.telefono,
+        email: j.email,
       }));
 
-    const payload = {
-      equipo,
-      jugadores: jugadoresValidos,
-    };
+   const payload = {
+  equipo,
+  capitan,
+  jugadores: jugadoresValidos,
+};
 
     await servicio1.enviarequipo(payload);
 
-    alert("Equipo registrado correctamente 🏀");
+  alert("Equipo registrado correctamente 🏀");
 
-    // reset opcional
-    setEquipo("");
-    setJugadores([{ ...jugadorVacio }]);
+setEquipo("");
+setJugadores([{ ...jugadorVacio }]);
+setCapitan(null);
+setSeleccionCapitan(false);
 
   } catch (error) {
   console.error(error);
@@ -128,7 +140,125 @@ const handleSubmit = async () => {
   alert("Error al enviar el equipo");
 }
 };
+if (seleccionCapitan) {
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        p: 3,
+        background:
+          "linear-gradient(135deg, #4CAF50 0%, #1E88E5 100%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+     <Typography
+  sx={{
+    color: "#fff",
+    fontSize: "2rem",
+    fontWeight: "bold",
+    mb: 1,
+    textAlign: "center",
+    animation: "fadeIn 0.8s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 1.5,
+  }}
+>
+ 
+   ⓒ
 
+
+  Elegí el Capitán del Equipo
+</Typography>
+
+      <Typography
+        sx={{
+          color: "rgba(255,255,255,0.8)",
+          fontSize: "0.75rem",
+          textAlign: "center",
+          mb: 4,
+          maxWidth: 400,
+        }}
+      >
+        El capitán será responsable del equipo y de transmitir
+        la información de los partidos a sus compañeros.
+      </Typography>
+
+      {jugadores
+        .filter(j => j.confirmado)
+        .map((j, index) => (
+          <Paper
+            key={index}
+            onClick={() => setCapitan(j.dni)}
+            sx={{
+              width: "100%",
+              maxWidth: 500,
+              p: 2,
+              mb: 2,
+              cursor: "pointer",
+              borderRadius: 4,
+              textAlign: "center",
+
+              background:
+                capitan === j.dni
+                  ? "linear-gradient(90deg,#f59e0b,#f97316)"
+                  : "linear-gradient(180deg,#1e293b,#0f172a)",
+
+              color: "#fff",
+
+              transform:
+                capitan === j.dni
+                  ? "scale(1.05)"
+                  : "scale(1)",
+
+              transition: "all .3s",
+
+              animation: `fadeIn .5s ease ${index * 0.1}s both`,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+              }}
+            >
+              {j.nombre} {j.apellido}
+            </Typography>
+
+            {capitan === j.dni && (
+              <Typography
+                sx={{
+                  color: "#fff",
+                  mt: 1,
+                  fontWeight: "bold",
+                }}
+              >
+                ⓒ CAPITÁN
+              </Typography>
+            )}
+          </Paper>
+        ))}
+
+      <Button
+        variant="contained"
+        disabled={!capitan}
+        onClick={handleSubmit}
+        sx={{
+          mt: 3,
+          bgcolor: "#f97316",
+          px: 5,
+          py: 1.5,
+          fontSize: "1.1rem",
+        }}
+      >
+        Confirmar equipo
+      </Button>
+    </Box>
+  );
+}
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box
@@ -171,13 +301,23 @@ const handleSubmit = async () => {
           </Typography>
 
           {/* EQUIPO */}
-          <TextField
-            label="Nombre del equipo"
-            value={equipo}
-            onChange={(e) => setEquipo(e.target.value)}
-            fullWidth
-            sx={inputStyles}
-          />
+        <Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 1000,
+    py: 1,
+    background: "linear-gradient(135deg, #4CAF50 0%, #1E88E5 100%)",
+  }}
+>
+  <TextField
+    label="Nombre del equipo"
+    value={equipo}
+    onChange={(e) => setEquipo(e.target.value)}
+    fullWidth
+    sx={inputStyles}
+  />
+</Box>
 
           {/* JUGADORES */}
           {jugadores.map((jugador, index) => (
@@ -278,17 +418,46 @@ const handleSubmit = async () => {
                   sx={inputStyles}
                 />
 
-                <DatePicker
-                  label="Fecha de nacimiento"
-                  value={jugador.fechaNacimiento}
-                  onChange={(newValue) =>
-                    handleChangeJugador(index, "fechaNacimiento", newValue)
+              <DatePicker
+  label="Fecha de nacimiento"
+  value={jugador.fechaNacimiento}
+  onChange={(newValue) =>
+    handleChangeJugador(index, "fechaNacimiento", newValue)
+  }
+  disabled={jugador.confirmado && !jugador.editando}
+  slotProps={{
+    textField: {
+      fullWidth: true,
+      sx: inputStyles,
+    },
+  }}
+/>
+    <TextField
+                  label="Telefono de contacto"
+                  type="number"
+                  value={jugador.telefono}
+                  onChange={(e) =>
+                    handleChangeJugador(index, "telefono", e.target.value)
                   }
                   disabled={jugador.confirmado && !jugador.editando}
-                  renderInput={(params) => (
-                    <TextField {...params} sx={inputStyles} />
-                  )}
+                  fullWidth
+                  sx={inputStyles}
                 />
+
+
+                <TextField
+  label="Email"
+  type="email"
+  value={jugador.email}
+  onChange={(e) =>
+    handleChangeJugador(index, "email", e.target.value)
+  }
+  disabled={jugador.confirmado && !jugador.editando}
+  fullWidth
+  sx={inputStyles}
+/>
+
+
 
                 {/* BOTONES */}
                 {!jugador.confirmado || jugador.editando ? (
@@ -321,10 +490,10 @@ const handleSubmit = async () => {
           ))}
 
           {/* FINAL */}
-      <Button
+    <Button
   variant="contained"
   disabled={jugadoresConfirmados < 3 || !equipo}
-  onClick={handleSubmit}
+  onClick={() => setSeleccionCapitan(true)}
 >
   Finalizar equipo ({jugadoresConfirmados}/5)
 </Button>

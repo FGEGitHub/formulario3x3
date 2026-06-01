@@ -1,4 +1,5 @@
 import React from "react";
+import Nav from "../../components/admin/Nav";
 
 import Formulario from "../../components/admin/torneos";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ const HeroSection = () => {
     const navigate = useNavigate();
   return (
    <>
-  
+  <Nav/>
    <Formulario/>
    </>
   );
