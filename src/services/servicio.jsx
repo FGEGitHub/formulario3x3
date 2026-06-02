@@ -36,6 +36,15 @@ const traerEquipos = async (datos) => {
 
 }
 
+const traerJugadores = async (datos) => {
+
+  // const data = await axios.post('http://localhost:4000/signupp', datos)
+  const { data } = await axios.get(baseUrl + 'traerJugadores', datos)
+  return data
+
+}
+
+
 const traerTorneos = async (datos) => {
 
   // const data = await axios.post('http://localhost:4000/signupp', datos)
@@ -70,4 +79,4 @@ const guardarPartido = async (datos) => {
 
 
 
-export default {crearTorneo,traerEquipos, enviarequipo,traerTorneos, traerTorneo, guardarPartido, traertablas}
+export default {traerJugadores, crearTorneo,traerEquipos, enviarequipo,traerTorneos, traerTorneo, guardarPartido, traertablas}
