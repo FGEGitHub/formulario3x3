@@ -1,6 +1,6 @@
 import React from "react";
 
-import Formulario from "../../components/admin/torneo";
+import Formulario from "../../components/admin/estadotorneo";
 import Nav from "../../components/admin/Nav";
 
 import { useNavigate } from "react-router-dom";
